@@ -6,18 +6,22 @@ int main() {
   std::cin >> input;
   std::cin.ignore();
 
-  numbers<2, 10, char> test( input );
+  //numbers<10, 16, char> C;
+  numbers<10, 16, char> test( input );
   std::cout << std::endl;
 
   std::cin >> input;
   std::cin.ignore();
 
-  numbers<2, 10, char> test2( input );
+  numbers<10, 16, char> test2( input );
   std::cout << std::endl;
 
-  std::vector<char> result = test.sum(test2);
-  for (char digit : result)
-    std::cout << digit;
-  fflush(stdout);
+  test.sum(test2).write(std::cout);
+  
+  std::cout << std::endl;
+  std::cout << "resta: ";
+
+  test.sub(test2).write(std::cout);
+ 
 
 }
