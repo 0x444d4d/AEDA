@@ -20,21 +20,21 @@ class numbers{
   numbers<N, B, T> sum( numbers<N,B,T> A );
   numbers<N, B, T> sub( numbers<N,B,T> A );
   std::ostream& write( std::ostream& os ) const;
+  bool operator<( const numbers<N,B,T>& A ) const;
+  bool operator>( const numbers<N,B,T>& A ) const;
+  bool operator==( const numbers<N,B,T>& A ) const;
+
   private:
 
-  inline std::vector<T> get_number(void) { return number_; }
-  char int_to_char( unsigned num );
-  int char_to_int( char num );
   void to_base( int input, unsigned pos = 0);
+  int char_to_int( char num );
+  char int_to_char( unsigned num );
+  inline std::vector<T> get_number(void) { return number_; }
+  bool less_than( const numbers<N,B,T>& A );
+  bool equals( const numbers<N,B,T>& A );
   
 };
 
-/*
-template < size_t N, size_t B, class T >
-std::vector<T> numbers<N, B, T>::get_number(void) {
-  return number_;
-}
-*/
 
 //constructor
 template <size_t N, size_t B, class T>
@@ -175,3 +175,38 @@ numbers<N,B,T> numbers<N,B,T>::sub( numbers A ) {
   return C;
 }
 
+template<size_t N, size_t B, class T> 
+bool numbers<N,B,T>::less_than(const numbers& A) {
+  if ( size_ < A.size_ ) return true;
+  if ( size_ == A.size_ ) {
+    for( int inx = (size_ - 1); inx >= 0; --inx) {
+      if ( number_[inx] < A.number_[inx] ) return true;
+    }
+  }
+  return false;
+}
+
+
+template<size_t N, size_t B, class T> 
+bool numbers<N,B,T>::equals(const numbers& A) {
+  if ( size_ == A.size_ ) return true;
+  return false;
+}
+
+template< size_t N, size_t B, class T>
+bool numbers<N,B,T>::operator<( const numbers& A ) const {
+  return less( A );
+}
+
+
+template< size_t N, size_t B, class T>
+bool numbers<N,B,T>::operator>( const numbers& A ) const {
+  if ( !equals(A) ) return !less( A );
+  return false;
+}
+
+
+template< size_t N, size_t B, class T>
+bool numbers<N,B,T>::operator==( const numbers& A ) const {
+  return equals( A );
+}
