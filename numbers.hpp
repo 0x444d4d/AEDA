@@ -9,11 +9,11 @@ template <size_t N, size_t B, class T = char>
 class numbers{
 
   private:
-  std::vector<T> number_;
+  char number_[N];
   unsigned short size_;
   
   public:
-  numbers(void): number_(N), size_(0) {};
+  numbers(void):size_(0) {};
   explicit numbers( const std::string& number );
   ~numbers(void) {}
 
@@ -23,6 +23,9 @@ class numbers{
   bool operator<( const numbers<N,B,T>& A ) const;
   bool operator>( const numbers<N,B,T>& A ) const;
   bool operator==( const numbers<N,B,T>& A ) const;
+  bool operator!=( const numbers<N,B,T>& A ) const;
+  bool less_than( numbers<N,B,T> A );
+  bool equals( numbers<N,B,T> A );
 
   private:
 
@@ -30,23 +33,24 @@ class numbers{
   int char_to_int( char num );
   char int_to_char( unsigned num );
   inline std::vector<T> get_number(void) { return number_; }
-  bool less_than( const numbers<N,B,T>& A );
-  bool equals( const numbers<N,B,T>& A );
   
 };
 
 
 //constructor
 template <size_t N, size_t B, class T>
-numbers<N, B, T>::numbers(const std::string& number): number_(N), size_(0) {
+numbers<N, B, T>::numbers(const std::string& number):size_(0) {
   if ( B < 2 ) {
     //trow exception, base cant be lower than 2
   }
 
   to_base( std::stoi(number) );
-  for (auto digit : number_) {
-    std::cout << digit;
+
+  /*
+  for (int inx = 0; inx < size_ ; ++inx) {
+    std::cout << number_[inx];
   }
+  */
 
   fflush(stdout);
 }
@@ -82,12 +86,12 @@ template <size_t N, size_t B, class T>
 void numbers<N, B, T>::to_base(int input, unsigned pos ) {
   if ( input < B ) {
     //std::cout << "insertando: " << int_to_char(input) << std::endl;
-    number_.push_back( int_to_char(input) );
+    number_[pos] = int_to_char(input);
     ++size_;
   }
   else {
     //std::cout << "insertando: " << int_to_char(input % B) << std::endl;
-    number_.push_back( int_to_char(input % B) );
+    number_[pos]  = int_to_char(input % B);
     ++size_;
     input = input / B;
     to_base( input, ++pos );
@@ -98,11 +102,11 @@ void numbers<N, B, T>::to_base(int input, unsigned pos ) {
 //sum
 template <size_t N, size_t B, class T>
 numbers<N, B, T> numbers<N, B, T>::sum( numbers A ) {
-  std::vector<T> A_number = A.get_number();
-  numbers<N, B, T> C;
-  size_t result_size = number_.size() < A_number.size() ? A_number.size() : number_.size();
-  unsigned aux;
+  numbers<N, B, T> C; //resultado de la suma.
+  size_t result_size = size_ < A.size_ ? A.size_ : size_; //tamaño del resultado.
+  unsigned aux; //resultado de la suma de dos digitos.
   bool carry = false;
+  unsigned short inx;
 
   /*
   if ( B != A.B ) {
@@ -110,29 +114,42 @@ numbers<N, B, T> numbers<N, B, T>::sum( numbers A ) {
   }
   */
 
-  for ( int inx = 0; inx < result_size; ++inx ) {
-    if ( inx < A_number.size() && inx < number_.size() ) {
-      aux = char_to_int( A_number[inx] ) + char_to_int( number_[inx] );
-    } else if ( inx < number_.size() ) {
+  for ( inx = 0; inx < result_size; ++inx ) {
+
+    if ( inx < A.size_ && inx < size_ ) {
+      aux = char_to_int( A.number_[inx] ) + char_to_int( number_[inx] );
+    } else if ( inx < size_ ) {
       aux = char_to_int( number_[inx] );
     } else {
-      aux = char_to_int( A_number[inx] );
+      aux = char_to_int( A.number_[inx] );
     }
-
 
     if ( carry ) {
       ++aux;
       carry = false;
     }
+
     if ( aux < B ) {
-      C.number_.push_back( int_to_char(aux) );
+      C.number_[inx] = int_to_char(aux);
+      ++C.size_;
     } else {
-      C.number_.push_back( int_to_char( aux - B ) );
+      C.number_[inx] = int_to_char( aux - B );
+      ++C.size_;
       carry = true;
     }
+
   }
   if ( carry ) {
-    C.number_.push_back( int_to_char(1) );
+
+    if ( inx >= N ) {
+      //trow exceptio out of size 
+      std::cout << "error" << std::endl;
+    } else {
+      //std::cout << inx << std::endl;
+      C.number_[inx] = int_to_char(1) ;
+      ++C.size_;
+    }
+
   }
   return C;
 }
@@ -140,8 +157,12 @@ numbers<N, B, T> numbers<N, B, T>::sum( numbers A ) {
 //write
 template <size_t N, size_t B, class T>
 std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
-  for (char digit: number_ ){
-    os << digit;
+  if ( size_ == 0 ) {
+    os << 0;
+  } else {
+    for (int inx = (size_ - 1); inx >= 0; --inx ){
+      os << number_[inx];
+    }
   }
 
   fflush(stdout);
@@ -152,22 +173,23 @@ std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
 template <size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::sub( numbers A ) {
   numbers<N,B,T> C;
-  std::vector<T> A_number = A.get_number();
-  size_t result_size = number_.size() < A_number.size() ? A_number.size() : number_.size();
-  std::vector<T> result;
+  size_t result_size = size_ < A.size_ ? A.size_ : size_;
   bool carry = false;
 
   //Si A > B trow;
+  C.size_ =  result_size;
 
   for ( int inx = 0; inx < result_size; ++inx ) {
-    if ( number_[inx] < A_number[inx] ) {
-      C.number_.push_back( B - ( char_to_int( A_number[inx]) - char_to_int(number_[inx]) ) );
+    if ( number_[inx] < A.number_[inx] ) {
+      C.number_[inx] = ( B - ( char_to_int( A.number_[inx]) - char_to_int(number_[inx]) ) );
       if ( carry ) {
         --C.number_[inx];
+      if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
       }
       carry = true;
     } else {
-      C.number_.push_back( int_to_char(char_to_int( number_[inx] ) - char_to_int( A_number[inx] ) ));
+      C.number_[inx] = ( int_to_char(char_to_int( number_[inx] ) - char_to_int( A.number_[inx] ) ));
+      if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
     }
   }
 
@@ -176,11 +198,12 @@ numbers<N,B,T> numbers<N,B,T>::sub( numbers A ) {
 }
 
 template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::less_than(const numbers& A) {
+bool numbers<N,B,T>::less_than(numbers A) {
   if ( size_ < A.size_ ) return true;
   if ( size_ == A.size_ ) {
     for( int inx = (size_ - 1); inx >= 0; --inx) {
       if ( number_[inx] < A.number_[inx] ) return true;
+      if ( number_[inx] > A.number_[inx] ) return false;
     }
   }
   return false;
@@ -188,8 +211,12 @@ bool numbers<N,B,T>::less_than(const numbers& A) {
 
 
 template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::equals(const numbers& A) {
-  if ( size_ == A.size_ ) return true;
+bool numbers<N,B,T>::equals(numbers A) {
+  if ( size_ == A.size_ ) {
+    for ( int inx = 0; inx < size_; ++inx )
+      if ( number_[inx] != A.number_[inx] ) return false;
+    return true;
+  }
   return false;
 }
 
@@ -209,4 +236,10 @@ bool numbers<N,B,T>::operator>( const numbers& A ) const {
 template< size_t N, size_t B, class T>
 bool numbers<N,B,T>::operator==( const numbers& A ) const {
   return equals( A );
+}
+
+
+template< size_t N, size_t B, class T>
+bool numbers<N,B,T>::operator!=( const numbers& A ) const {
+  return !equals( A );
 }
