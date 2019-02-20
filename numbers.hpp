@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <iostream>
+#include <stdexcept>
 
 template <size_t N, size_t B, class T = char>
 class numbers{
@@ -13,10 +14,11 @@ class numbers{
   unsigned short size_;
   
   public:
-  numbers(void):size_(0) {};
-  explicit numbers( const std::string& number );
+  //numbers(void):size_(0) {};
+  explicit numbers( const std::string& number = "0");
   ~numbers(void) {}
 
+  numbers<2*N, B, T> mul( numbers<N,B,T> A );
   numbers<N, B, T> sum( numbers<N,B,T> A );
   numbers<N, B, T> sub( numbers<N,B,T> A );
   std::ostream& write( std::ostream& os ) const;
@@ -24,15 +26,17 @@ class numbers{
   bool operator>( const numbers<N,B,T>& A ) const;
   bool operator==( const numbers<N,B,T>& A ) const;
   bool operator!=( const numbers<N,B,T>& A ) const;
-  bool less_than( numbers<N,B,T> A );
-  bool equals( numbers<N,B,T> A );
+numbers<N,B,T> operator+( const numbers<N,B,T>& A);
+numbers<N,B,T> operator-( const numbers<N,B,T>& A);
 
   private:
 
   void to_base( int input, unsigned pos = 0);
   int char_to_int( char num );
   char int_to_char( unsigned num );
-  inline std::vector<T> get_number(void) { return number_; }
+  bool less_than( numbers<N,B,T> A ) const;
+  bool equals( numbers<N,B,T> A ) const;
+  //inline std::vector<T> get_number(void) { return number_; }
   
 };
 
@@ -41,7 +45,7 @@ class numbers{
 template <size_t N, size_t B, class T>
 numbers<N, B, T>::numbers(const std::string& number):size_(0) {
   if ( B < 2 ) {
-    //trow exception, base cant be lower than 2
+    throw "exception, base cant be lower than 2";
   }
 
   to_base( std::stoi(number) );
@@ -65,8 +69,7 @@ char numbers<N, B, T>::int_to_char(unsigned num) {
       return ( (num - 10) + 'A' );
     }
   }
-  //Throw exeption instead of returning '\n 
-  return '\0';
+  //throw "invalid argument";
 }
 
 //char_to_int
@@ -77,20 +80,17 @@ int numbers<N, B, T>::char_to_int( char num ) {
   } else if ( num >= 'A' && num <= 'Z' ) {
     return ( num - 'A' + 10 );
   }
-  //Throw exeption instead of returning -1
-  return -1;
+  //throw "invalid argument";
 }
 
 //to_base
 template <size_t N, size_t B, class T>
 void numbers<N, B, T>::to_base(int input, unsigned pos ) {
   if ( input < B ) {
-    //std::cout << "insertando: " << int_to_char(input) << std::endl;
     number_[pos] = int_to_char(input);
     ++size_;
   }
   else {
-    //std::cout << "insertando: " << int_to_char(input % B) << std::endl;
     number_[pos]  = int_to_char(input % B);
     ++size_;
     input = input / B;
@@ -98,6 +98,7 @@ void numbers<N, B, T>::to_base(int input, unsigned pos ) {
   }
   
 }
+
 
 //sum
 template <size_t N, size_t B, class T>
@@ -142,10 +143,8 @@ numbers<N, B, T> numbers<N, B, T>::sum( numbers A ) {
   if ( carry ) {
 
     if ( inx >= N ) {
-      //trow exceptio out of size 
-      std::cout << "error" << std::endl;
+      throw "out of size: number to big for array size";
     } else {
-      //std::cout << inx << std::endl;
       C.number_[inx] = int_to_char(1) ;
       ++C.size_;
     }
@@ -153,6 +152,44 @@ numbers<N, B, T> numbers<N, B, T>::sum( numbers A ) {
   }
   return C;
 }
+
+
+//sub
+template <size_t N, size_t B, class T>
+numbers<N,B,T> numbers<N,B,T>::sub( numbers A ) {
+  numbers<N,B,T> C;
+  size_t result_size = size_ < A.size_ ? A.size_ : size_;
+  bool carry = false;
+
+  //if ( less_than(A) ) throw "number too big";
+  C.size_ =  result_size;
+
+  for ( int inx = 0; inx < result_size; ++inx ) {
+    if ( number_[inx] < A.number_[inx] ) {
+      C.number_[inx] = int_to_char(( B - ( char_to_int( A.number_[inx]) - char_to_int(number_[inx]) ) ));
+      if ( carry ) {
+        --C.number_[inx];
+      //if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
+      }
+      carry = true;
+    } else {
+      C.number_[inx] = ( int_to_char(char_to_int( number_[inx] ) - char_to_int( A.number_[inx] ) ));
+      if ( carry ) {
+        --C.number_[inx];
+        carry = false;
+      }
+      //if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
+    }
+  }
+
+
+  for (int inx = (C.size_ - 1); inx >= 0; --inx ) {
+    if ( char_to_int(C.number_[inx]) == 0  ) --C.size_;
+    else break;
+  }   
+  return C;
+}
+
 
 //write
 template <size_t N, size_t B, class T>
@@ -169,36 +206,8 @@ std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
   return os;
 }
 
-//sub
-template <size_t N, size_t B, class T>
-numbers<N,B,T> numbers<N,B,T>::sub( numbers A ) {
-  numbers<N,B,T> C;
-  size_t result_size = size_ < A.size_ ? A.size_ : size_;
-  bool carry = false;
-
-  //Si A > B trow;
-  C.size_ =  result_size;
-
-  for ( int inx = 0; inx < result_size; ++inx ) {
-    if ( number_[inx] < A.number_[inx] ) {
-      C.number_[inx] = ( B - ( char_to_int( A.number_[inx]) - char_to_int(number_[inx]) ) );
-      if ( carry ) {
-        --C.number_[inx];
-      if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
-      }
-      carry = true;
-    } else {
-      C.number_[inx] = ( int_to_char(char_to_int( number_[inx] ) - char_to_int( A.number_[inx] ) ));
-      if ( char_to_int(C.number_[inx]) == 0 ) --C.size_;
-    }
-  }
-
-  //return result;
-  return C;
-}
-
 template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::less_than(numbers A) {
+bool numbers<N,B,T>::less_than(numbers A) const {
   if ( size_ < A.size_ ) return true;
   if ( size_ == A.size_ ) {
     for( int inx = (size_ - 1); inx >= 0; --inx) {
@@ -211,7 +220,7 @@ bool numbers<N,B,T>::less_than(numbers A) {
 
 
 template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::equals(numbers A) {
+bool numbers<N,B,T>::equals(numbers A) const {
   if ( size_ == A.size_ ) {
     for ( int inx = 0; inx < size_; ++inx )
       if ( number_[inx] != A.number_[inx] ) return false;
@@ -222,13 +231,13 @@ bool numbers<N,B,T>::equals(numbers A) {
 
 template< size_t N, size_t B, class T>
 bool numbers<N,B,T>::operator<( const numbers& A ) const {
-  return less( A );
+  return less_than( A );
 }
 
 
 template< size_t N, size_t B, class T>
 bool numbers<N,B,T>::operator>( const numbers& A ) const {
-  if ( !equals(A) ) return !less( A );
+  if ( !equals(A) ) return !less_than( A );
   return false;
 }
 
@@ -242,4 +251,16 @@ bool numbers<N,B,T>::operator==( const numbers& A ) const {
 template< size_t N, size_t B, class T>
 bool numbers<N,B,T>::operator!=( const numbers& A ) const {
   return !equals( A );
+}
+
+
+template< size_t N, size_t B, class T>
+numbers<N,B,T> numbers<N,B,T>::operator+( const numbers& A ) {
+  return sum( A );
+}
+
+
+template< size_t N, size_t B, class T>
+numbers<N,B,T> numbers<N,B,T>::operator-( const numbers& A ) {
+  return sub( A );
 }
