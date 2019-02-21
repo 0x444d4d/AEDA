@@ -19,15 +19,14 @@ class numbers{
   ~numbers(void) {}
 
   numbers<2*N, B, T> mul( numbers<N,B,T> A );
-  numbers<N, B, T> sum( numbers<N,B,T> A );
-  numbers<N, B, T> sub( numbers<N,B,T> A );
   std::ostream& write( std::ostream& os ) const;
   bool operator<( const numbers<N,B,T>& A ) const;
   bool operator>( const numbers<N,B,T>& A ) const;
   bool operator==( const numbers<N,B,T>& A ) const;
   bool operator!=( const numbers<N,B,T>& A ) const;
-numbers<N,B,T> operator+( const numbers<N,B,T>& A);
-numbers<N,B,T> operator-( const numbers<N,B,T>& A);
+  numbers<N,B,T> operator+( const numbers<N,B,T>& A);
+  numbers<N,B,T> operator-( const numbers<N,B,T>& A);
+  //friend std::ostream& operator<<( std::ostream& os, numbers<N,B,T>& A);
 
   private:
 
@@ -36,6 +35,8 @@ numbers<N,B,T> operator-( const numbers<N,B,T>& A);
   char int_to_char( unsigned num );
   bool less_than( numbers<N,B,T> A ) const;
   bool equals( numbers<N,B,T> A ) const;
+  numbers<N, B, T> sum( numbers<N,B,T> A );
+  numbers<N, B, T> sub( numbers<N,B,T> A );
   //inline std::vector<T> get_number(void) { return number_; }
   
 };
@@ -69,6 +70,7 @@ char numbers<N, B, T>::int_to_char(unsigned num) {
       return ( (num - 10) + 'A' );
     }
   }
+  //return NULL;
   //throw "invalid argument";
 }
 
@@ -80,6 +82,7 @@ int numbers<N, B, T>::char_to_int( char num ) {
   } else if ( num >= 'A' && num <= 'Z' ) {
     return ( num - 'A' + 10 );
   }
+  //return -1;
   //throw "invalid argument";
 }
 
@@ -263,4 +266,9 @@ numbers<N,B,T> numbers<N,B,T>::operator+( const numbers& A ) {
 template< size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::operator-( const numbers& A ) {
   return sub( A );
+}
+
+template< size_t N, size_t B, class T>
+std::ostream& operator<<(std::ostream& os, const numbers<N,B,T>& A) {
+  return A.write(os);
 }
