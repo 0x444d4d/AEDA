@@ -106,11 +106,11 @@ numbers<N,B,T>::~numbers(void) noexcept(false) {
 template <size_t N, size_t B, class T>
 void numbers<N, B, T>::to_base(int input, unsigned pos ) {
   if ( input < B ) {
-    number_[pos] = int_to_char(input);
+    number_[pos] = input;
     ++size_;
   }
   else {
-    number_[pos]  = int_to_char(input % B);
+    number_[pos]  = input % B;
     ++size_;
     input = input / B;
     to_base( input, ++pos );
@@ -130,20 +130,19 @@ numbers<N, B, T> numbers<N, B, T>::sum( const numbers A ) const {
   for ( inx = 0; inx < result_size; ++inx ) {
 
     if ( inx < A.size_ && inx < size_ )
-      aux = char_to_int( A.number_[inx] ) + char_to_int( number_[inx] ) + carry;
+      aux = A.number_[inx] + number_[inx] + carry;
     else if ( inx < size_ ) 
-      aux = char_to_int( number_[inx] ) + carry;
+      aux = number_[inx] + carry;
     else 
-      aux = char_to_int( A.number_[inx] );
+      aux = A.number_[inx] + carry;
     
-
     carry = 0;
 
     if ( aux < B ) {
-      C.number_[inx] = int_to_char(aux);
+      C.number_[inx] = aux;
       ++C.size_;
     } else {
-      C.number_[inx] = int_to_char( aux - B );
+      C.number_[inx] = ( aux - B );
       ++C.size_;
       carry = 1;
     }
@@ -154,7 +153,7 @@ numbers<N, B, T> numbers<N, B, T>::sum( const numbers A ) const {
     if ( inx >= N ) {
       throw "out of size: number to big for array size";
     } else {
-      C.number_[inx] = int_to_char(1) ;
+      C.number_[inx] = 1;
       ++C.size_;
     }
   }
@@ -166,7 +165,7 @@ template <size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
   numbers<N,B,T> X,Y,C;
   size_t result_size = size_ < A.size_ ? A.size_ : size_;
-  bool carry = false;
+  uint_fast8_t borrow = false;
   int aux = 0;
 
   if ( less_than(A) ) {
@@ -187,35 +186,33 @@ numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
   for ( int inx = 0; inx < result_size; ++inx ) {
 
     if ( inx < X.size_ && inx < Y.size_ ) {
-      aux = char_to_int( X.number_[inx] ) - char_to_int( Y.number_[inx] );
+      aux =  X.number_[inx] - Y.number_[inx] - borrow;
     } else if ( inx < X.size_ ) {
-      aux = char_to_int( X.number_[inx] );
+      aux = X.number_[inx] - borrow;
     } else  {
-      aux = char_to_int( Y.number_[inx] );
+      aux = Y.number_[inx] - borrow;
     }
 
-    if ( carry ) --aux;
+    //if ( borrow ) --aux;
 
     if ( aux < 0 ) {
       aux += B;
-      C.number_[inx] = int_to_char( aux );
+      C.number_[inx] = aux;
       ++C.size_;
-      carry = true;
+      borrow = 1;
     } else {
        
-      C.number_[inx] = int_to_char( aux );
+      C.number_[inx] = aux;
       ++C.size_;
-      carry = false;
+      borrow = 0;
     }
   }
     
   for (int inx = (C.size_ - 1); inx >= 0; --inx ) {
-    if ( check_char_range( C.number_[inx] ) == false ) --C.size_;
-    else {
-      if ( char_to_int(C.number_[inx]) == 0  ) --C.size_;
-      else break;
-    }
-  }   
+    if ( C.number_[inx] == 0 ) --C.size_;
+    else break;
+  }
+
   return C;
 }
 
@@ -243,7 +240,7 @@ std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
     os << 0;
   } else {
     for (int inx = (size_ - 1); inx >= 0; --inx ){
-      os << number_[inx];
+      os << int_to_char( number_[inx] );
     }
   }
 
