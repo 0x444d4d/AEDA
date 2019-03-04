@@ -1,67 +1,65 @@
+
 #pragma once
 
-#define DEBG
+#define DE2G
 
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 
-#include "numbers-helpers.hpp"
+#include "numbers.hpp"
 
 //PENDIENTE: clear();
 //Resta de negativos.
 //Suma de negativos.
 
-template <size_t N, size_t B, class T = char>
-class numbers{
+template <size_t N, class T>
+class numbers<N,2,T>{
 
   private:
   T* number_;
-  bool negative_;
   unsigned short size_;
   
   public:
 
-  numbers( void ): size_(0), negative_(false) { number_ = new T[N]; }
-  explicit numbers( const std::string& number );
-  numbers( const numbers<N,B,T>& old);
+  explicit numbers( const std::string& number = "0");
+  explicit numbers( const numbers<N,2,T>& old);
   ~numbers( void );
 
-  numbers<2*N, B, T> mul( numbers<N,B,T> A );
+  //numbers<2*N, 2, T> mul( numbers<N,2,T> A );
   std::ostream& write( std::ostream& os ) const;
-  bool operator<( const numbers<N,B,T>& A ) const;
-  bool operator>( const numbers<N,B,T>& A ) const;
-  bool operator==( const numbers<N,B,T>& A ) const;
-  bool operator!=( const numbers<N,B,T>& A ) const;
-  numbers<N,B,T> operator+( const numbers<N,B,T>& A);
-  numbers<N,B,T> operator-( const numbers<N,B,T>& A);
-  numbers<N,B,T>& operator=( const numbers<N,B,T>& A );
+  bool operator<( const numbers<N,2,T>& A ) const;
+  bool operator>( const numbers<N,2,T>& A ) const;
+  bool operator==( const numbers<N,2,T>& A ) const;
+  bool operator!=( const numbers<N,2,T>& A ) const;
+  numbers<N,2,T> operator+( const numbers<N,2,T>& A);
+  numbers<N,2,T> operator-( const numbers<N,2,T>& A);
+  numbers<N,2,T>& operator=( const numbers<N,2,T>& A );
 
   private:
 
   void to_base( int input, unsigned pos = 0);
-  //void clear(void); METODO NO USADO;
-  numbers<N,B,T>& copy( const numbers<N,B,T>& old );
-  bool less_than( numbers<N,B,T> A ) const;
-  bool equals( numbers<N,B,T> A ) const;
-  numbers<N, B, T> sum( const numbers<N,B,T> A ) const;
-  numbers<N, B, T> sub( const numbers<N,B,T> A ) const;
+  void clear(void);
+  numbers<N,2,T>& copy( const numbers<N,2,T>& old );
+  bool less_than( numbers<N,2,T> A ) const;
+  bool equals( numbers<N,2,T> A ) const;
+  numbers<N, 2, T> sum( const numbers<N,2,T> A ) const;
+  numbers<N, 2, T> sub( const numbers<N,2,T> A ) const;
   
 };
 
 
+
+
 //constructor
-template <size_t N, size_t B, class T>
-numbers<N, B, T>::numbers(const std::string& number):size_(0) {
-  if ( B < 2 ) {
+template <size_t N, class T>
+numbers<N, 2, T>::numbers(const std::string& number):size_(0) {
+  std::cout << "Numero binario" << std::endl;
+  if ( 2 < 2 ) {
     throw "exception, base cant be lower than 2";
   }
 
   if ( check_string(number) ) {
-
-    if ( number[0] == '-' ) negative_ = true;
-    else negative_ = false;
-            
 
     number_ = new T[N];
 
@@ -83,15 +81,15 @@ numbers<N, B, T>::numbers(const std::string& number):size_(0) {
 
 //constructor de copia
 
-template <size_t N, size_t B, class T>
-numbers<N,B,T>::numbers(const numbers<N,B,T>& old) {
+template <size_t N, class T>
+numbers<N,2,T>::numbers(const numbers<N,2,T>& old) {
   copy(old);
 }
 
 
 //destructor
-template <size_t N, size_t B, class T>
-numbers<N,B,T>::~numbers(void) noexcept(false) {
+template <size_t N, class T>
+numbers<N,2,T>::~numbers(void) noexcept(false) {
   
   if ( number_ != NULL ) {
     delete number_;
@@ -103,49 +101,52 @@ numbers<N,B,T>::~numbers(void) noexcept(false) {
 }
 
 //to_base
-template <size_t N, size_t B, class T>
-void numbers<N, B, T>::to_base(int input, unsigned pos ) {
-  if ( input < B ) {
+template <size_t N, class T>
+void numbers<N, 2, T>::to_base(int input, unsigned pos ) {
+  if ( input < 2 ) {
     number_[pos] = int_to_char(input);
     ++size_;
   }
   else {
-    number_[pos]  = int_to_char(input % B);
+    number_[pos]  = int_to_char(input % 2);
     ++size_;
-    input = input / B;
+    input = input / 2;
     to_base( input, ++pos );
   }
 }
 
 //sum
-template <size_t N, size_t B, class T>
-numbers<N, B, T> numbers<N, B, T>::sum( const numbers A ) const {
-  numbers<N, B, T> C; //resultado de la suma.
+template <size_t N, class T>
+numbers<N, 2, T> numbers<N, 2, T>::sum( const numbers A ) const {
+  numbers<N, 2, T> C; //resultado de la suma.
   size_t result_size = size_ < A.size_ ? A.size_ : size_; //tamaño del resultado.
   unsigned aux; //resultado de la suma de dos digitos.
-  uint_fast8_t carry = 0;
+  bool carry = false;
   unsigned short inx;
 
 
   for ( inx = 0; inx < result_size; ++inx ) {
 
     if ( inx < A.size_ && inx < size_ )
-      aux = char_to_int( A.number_[inx] ) + char_to_int( number_[inx] ) + carry;
+      aux = char_to_int( A.number_[inx] ) + char_to_int( number_[inx] );
     else if ( inx < size_ ) 
-      aux = char_to_int( number_[inx] ) + carry;
+      aux = char_to_int( number_[inx] );
     else 
       aux = char_to_int( A.number_[inx] );
     
 
-    carry = 0;
+    if ( carry ) {
+      ++aux;
+      carry = false;
+    }
 
-    if ( aux < B ) {
+    if ( aux < 2 ) {
       C.number_[inx] = int_to_char(aux);
       ++C.size_;
     } else {
-      C.number_[inx] = int_to_char( aux - B );
+      C.number_[inx] = int_to_char( aux - 2 );
       ++C.size_;
-      carry = 1;
+      carry = true;
     }
   }
 
@@ -162,9 +163,9 @@ numbers<N, B, T> numbers<N, B, T>::sum( const numbers A ) const {
 }
 
 //sub
-template <size_t N, size_t B, class T>
-numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
-  numbers<N,B,T> X,Y,C;
+template <size_t N, class T>
+numbers<N,2,T> numbers<N,2,T>::sub( const numbers A ) const {
+  numbers<N,2,T> X,Y,C;
   size_t result_size = size_ < A.size_ ? A.size_ : size_;
   bool carry = false;
   int aux = 0;
@@ -197,7 +198,7 @@ numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
     if ( carry ) --aux;
 
     if ( aux < 0 ) {
-      aux += B;
+      aux += 2;
       C.number_[inx] = int_to_char( aux );
       ++C.size_;
       carry = true;
@@ -219,10 +220,9 @@ numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
   return C;
 }
 
-template< size_t N, size_t B, class T>
-numbers<N,B,T>& numbers<N,B,T>::copy( const numbers<N,B,T>& old) {
+template< size_t N, class T>
+numbers<N,2,T>& numbers<N,2,T>::copy( const numbers<N,2,T>& old) {
   size_ = old.size_;
-  negative_ = old.negative_;
   number_ = new T[N];
 
   if ( number_ == NULL) 
@@ -236,9 +236,8 @@ numbers<N,B,T>& numbers<N,B,T>::copy( const numbers<N,B,T>& old) {
 }
 
 //write
-template <size_t N, size_t B, class T>
-std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
-  if ( negative_ ) os << "-";
+template <size_t N, class T>
+std::ostream& numbers<N, 2, T>::write( std::ostream& os ) const {
   if ( size_ == 0 ) {
     os << 0;
   } else {
@@ -251,8 +250,8 @@ std::ostream& numbers<N, B, T>::write( std::ostream& os ) const {
   return os;
 }
 
-template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::less_than(numbers A) const {
+template<size_t N, class T> 
+bool numbers<N,2,T>::less_than(numbers A) const {
   if ( size_ < A.size_ ) return true;
   if ( size_ == A.size_ ) {
     for( int inx = (size_ - 1); inx >= 0; --inx) {
@@ -263,8 +262,8 @@ bool numbers<N,B,T>::less_than(numbers A) const {
   return false;
 }
 
-template<size_t N, size_t B, class T> 
-bool numbers<N,B,T>::equals(numbers A) const {
+template<size_t N, class T> 
+bool numbers<N,2,T>::equals(numbers A) const {
   if ( size_ == A.size_ ) {
     for ( int inx = 0; inx < size_; ++inx )
       if ( number_[inx] != A.number_[inx] ) return false;
@@ -275,44 +274,43 @@ bool numbers<N,B,T>::equals(numbers A) const {
 
 
 
-template< size_t N, size_t B, class T>
-bool numbers<N,B,T>::operator<( const numbers& A ) const {
+template< size_t N, class T>
+bool numbers<N,2,T>::operator<( const numbers& A ) const {
   return less_than( A );
 }
 
-template< size_t N, size_t B, class T>
-bool numbers<N,B,T>::operator>( const numbers& A ) const {
+template< size_t N, class T>
+bool numbers<N,2,T>::operator>( const numbers& A ) const {
   if ( !equals(A) ) return !less_than( A );
   return false;
 }
 
-template< size_t N, size_t B, class T>
-bool numbers<N,B,T>::operator==( const numbers& A ) const {
+template< size_t N, class T>
+bool numbers<N,2,T>::operator==( const numbers& A ) const {
   return equals( A );
 }
 
-template< size_t N, size_t B, class T>
-numbers<N,B,T>& numbers<N,B,T>::operator=( const numbers& A ) {
+template< size_t N, class T>
+numbers<N,2,T>& numbers<N,2,T>::operator=( const numbers& A ) {
   return copy(A);
 }
 
-template< size_t N, size_t B, class T>
-bool numbers<N,B,T>::operator!=( const numbers& A ) const {
+template< size_t N, class T>
+bool numbers<N,2,T>::operator!=( const numbers& A ) const {
   return !equals( A );
 }
 
-template< size_t N, size_t B, class T>
-numbers<N,B,T> numbers<N,B,T>::operator+( const numbers& A ) {
+template< size_t N, class T>
+numbers<N,2,T> numbers<N,2,T>::operator+( const numbers& A ) {
   return sum( A );
 }
 
-template< size_t N, size_t B, class T>
-numbers<N,B,T> numbers<N,B,T>::operator-( const numbers& A ) {
+template< size_t N, class T>
+numbers<N,2,T> numbers<N,2,T>::operator-( const numbers& A ) {
   return sub( A );
 }
 
-template< size_t N, size_t B, class T>
-std::ostream& operator<<(std::ostream& os, const numbers<N,B,T>& A) {
+template< size_t N, class T>
+std::ostream& operator<<(std::ostream& os, const numbers<N,2,T>& A) {
   return A.write(os);
 }
-

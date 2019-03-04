@@ -43,6 +43,8 @@ void test_number( std::string input1, std::string input2) {
 
     std::cout << "resta" << std::endl;
     std::cout << v1 - v2 << std::endl;;
+    numbers<N,B,T> v3 = (v1 - v2);
+    std::cout << v3 << std::endl;
 
     std::cout << "numeros" << std::endl;
     std::cout << v1 << std::endl;
