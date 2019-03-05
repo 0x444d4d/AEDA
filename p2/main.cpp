@@ -1,4 +1,5 @@
 #include "numbers.hpp"
+#include "binary_numbers.hpp"
 
 template<int N, int B, class T = char>
 void test_number( std::string v1, std::string v2 );

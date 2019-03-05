@@ -1,4 +1,3 @@
-
 #pragma once
 
 #define DE2G
@@ -7,7 +6,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "numbers.hpp"
 
 //PENDIENTE: clear();
 //Resta de negativos.

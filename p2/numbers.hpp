@@ -8,7 +8,7 @@
 
 #include "numbers-helpers.hpp"
 
-//PENDIENTE: clear();
+//PENDIENTE: ;
 //Resta de negativos.
 //Suma de negativos.
 
@@ -165,7 +165,7 @@ template <size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::sub( const numbers A ) const {
   numbers<N,B,T> X,Y,C;
   size_t result_size = size_ < A.size_ ? A.size_ : size_;
-  uint_fast8_t borrow = false;
+  uint_fast8_t borrow = 0;
   int aux = 0;
 
   if ( less_than(A) ) {
