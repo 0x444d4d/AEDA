@@ -2,12 +2,12 @@
 #include "binary-numbers.hpp"
 
 template<int N, int B, class T = char>
-void test_number( std::string v1, std::string v2 );
+void test_number( int v1, int v2 );
 
 int main(void) {
   try {
 
-    std::string input1, input2;
+    int input1, input2;
     
     std::cout << "Valor del numero 1: ";
     std::cin >> input1;
@@ -33,10 +33,14 @@ int main(void) {
 
 
 template<int N, int B, class T>
-void test_number( std::string input1, std::string input2) {
+void test_number( int input1, int input2) {
     numbers<N,B,T> v1(input1);
     numbers<N,B,T> v2(input2);
     std::cout << "Base: " << B << std::endl;
+    std::cout << "numeros" << std::endl;
+    std::cout << v1 << std::endl;
+    std::cout << v2 << std::endl;
+    std::cout << std::endl;
 
     std::cout << "suma" << std::endl;
     std::cout << v1 + v2 << std::endl;
@@ -46,10 +50,6 @@ void test_number( std::string input1, std::string input2) {
     std::cout << v1 - v2 << std::endl;;
     numbers<N,B,T> v3 = (v1 - v2);
     std::cout << v3 << std::endl;
-
-    std::cout << "numeros" << std::endl;
-    std::cout << v1 << std::endl;
-    std::cout << v2 << std::endl;
     std::cout << std::endl;
 
 

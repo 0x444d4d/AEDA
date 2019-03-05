@@ -24,8 +24,8 @@ class numbers<N,2,T>{
   
   public:
 
-  numbers( void ): size_(0) { number_ = new T[N]; }
-  explicit numbers( const std::string& number );
+  numbers( void );
+  explicit numbers( const int number );
   numbers( const numbers<N,2,T>& old);
   ~numbers( void );
 
@@ -43,43 +43,46 @@ class numbers<N,2,T>{
 
   void to_base( int input, unsigned pos = 0);
   void complement( void );
-  //void clear(void); METODO NO USADO;
-  numbers<N,2,T>& copy( const numbers<N,2,T>& old );
+  void fill( int i );
   bool less_than( numbers<N,2,T> A ) const;
   bool equals( numbers<N,2,T> A ) const;
   numbers<N, 2, T> sum( const numbers<N,2,T> A ) const;
-  numbers<N, 2, T> sub( const numbers<N,2,T> A ) const;
+  numbers<N,2,T>& copy( const numbers<N,2,T>& old );
  
 };
 
 
+
+template <size_t N, class T>
+numbers<N, 2, T>::numbers(void):size_(0) {
+  number_ = new T[N];
+  fill(0);
+}
+
 //constructor
 template <size_t N, class T>
-numbers<N, 2, T>::numbers(const std::string& number):size_(0) {
-
-  if ( check_string(number) ) {
+numbers<N, 2, T>::numbers(const int number):size_(0) {
 
     number_ = new T[N];
 
     if ( number_ == NULL) 
       throw "Could not create array";
     else {
+      fill(0);
 
-      if ( number[0] == '-' || number[0] == '+' )
-        to_base( std::stoi( std::string (number.begin() + 1, number.end() )));
-      else
-        to_base( std::stoi( number ));
-
-      fflush(stdout);
-
+      if ( number < 0 ) {
+        //fill(1);
+        to_base( -number );
+        complement();
+      }
+      else{
+        //fill(0);
+        to_base( number );
+      }
     }
-
-  } else throw "Invalid number sent to constructor";
-  complement();
 }
 
 //constructor de copia
-
 template <size_t N, class T>
 numbers<N,2,T>::numbers(const numbers<N,2,T>& old) {
   copy(old);
@@ -97,6 +100,13 @@ numbers<N,2,T>::~numbers(void) noexcept(false) {
     throw "Double free";
   }
   
+}
+
+//fill
+template <size_t N, class T>
+void numbers<N,2,T>::fill( int i ) {
+  for (int inx = 0; inx < N; ++inx)
+    number_[inx] = i;
 }
 
 //to_base
@@ -117,7 +127,7 @@ void numbers<N, 2, T>::to_base(int input, unsigned pos ) {
 template <size_t N, class T>
 void numbers<N,2,T>::complement( void ) {
   bool neg_flag = false;
-  for (unsigned short inx = 0; inx < size_; ++inx ) {
+  for (unsigned short inx = 0; inx < N; ++inx ) {
     if ( neg_flag ) {
       if ( number_[inx] == 0  ) number_[inx] = 1;
       else number_[inx] = 0;
@@ -137,14 +147,9 @@ numbers<N, 2, T> numbers<N, 2, T>::sum( const numbers A ) const {
   unsigned short inx;
 
 
-  for ( inx = 0; inx < result_size; ++inx ) {
+  for ( inx = 0; inx < N; ++inx ) {
 
-    if ( inx < A.size_ && inx < size_ )
-      aux = A.number_[inx] + number_[inx] + carry;
-    else if ( inx < size_ ) 
-      aux = number_[inx] + carry;
-    else 
-      aux = A.number_[inx] + carry;
+    aux = A.number_[inx] + number_[inx] + carry;
     
     carry = 0;
 
@@ -158,67 +163,9 @@ numbers<N, 2, T> numbers<N, 2, T>::sum( const numbers A ) const {
     }
   }
 
-  if ( carry ) {
+  if ( carry == 1 ) {
 
-    if ( inx >= N ) {
-      throw "out of size: number to big for array size";
-    } else {
-      C.number_[inx] = 1;
-      ++C.size_;
-    }
   }
-  return C;
-}
-
-//sub
-template <size_t N, class T>
-numbers<N,2,T> numbers<N,2,T>::sub( const numbers A ) const {
-  numbers<N,2,T> X,Y,C;
-  size_t result_size = size_ < A.size_ ? A.size_ : size_;
-  uint_fast8_t borrow = 0;
-  int aux = 0;
-
-  if ( less_than(A) ) {
-    X = A;
-    Y = *this;
-  } else {
-    X = *this;
-    Y = A;
-  }
-
-
-  C.size_ = 0;
-
-  for ( int inx = 0; inx < result_size; ++inx ) {
-
-    if ( inx < X.size_ && inx < Y.size_ ) {
-      aux =  X.number_[inx] - Y.number_[inx] - borrow;
-    } else if ( inx < X.size_ ) {
-      aux = X.number_[inx] - borrow;
-    } else  {
-      aux = Y.number_[inx] - borrow;
-    }
-
-    //if ( borrow ) --aux;
-
-    if ( aux < 0 ) {
-      aux += 2;
-      C.number_[inx] = aux;
-      ++C.size_;
-      borrow = 1;
-    } else {
-       
-      C.number_[inx] = aux;
-      ++C.size_;
-      borrow = 0;
-    }
-  }
-    
-  for (int inx = (C.size_ - 1); inx >= 0; --inx ) {
-    if ( C.number_[inx] == 0 ) --C.size_;
-    else break;
-  }
-
   return C;
 }
 
@@ -230,7 +177,7 @@ numbers<N,2,T>& numbers<N,2,T>::copy( const numbers<N,2,T>& old) {
   if ( number_ == NULL) 
     throw "Could not create array";
   else {
-    for (int inx = 0; inx < size_; ++inx)
+    for (int inx = 0; inx < N; ++inx)
       number_[inx] = old.number_[inx];
   }
 
@@ -243,7 +190,7 @@ std::ostream& numbers<N, 2, T>::write( std::ostream& os ) const {
   if ( size_ == 0 ) {
     os << 0;
   } else {
-    for (int inx = (size_ - 1); inx >= 0; --inx ){
+    for (int inx = (N - 1); inx >= 0; --inx ){
       os << int_to_char( number_[inx] );
     }
   }
@@ -309,7 +256,12 @@ numbers<N,2,T> numbers<N,2,T>::operator+( const numbers& A ) {
 
 template< size_t N, class T>
 numbers<N,2,T> numbers<N,2,T>::operator-( const numbers& A ) {
-  return sub( A );
+  numbers<N,2,T> X(A);
+  
+  if ( A.number_[N - 1] == 1 ) {
+    X.complement();
+    return sum(X); 
+  } else return sum( A );
 }
 
 template< size_t N, class T>

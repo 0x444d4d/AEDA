@@ -23,11 +23,11 @@ class numbers{
   public:
 
   numbers( void ): size_(0), negative_(false) { number_ = new T[N]; }
-  explicit numbers( const std::string& number );
+  explicit numbers( const int number );
   numbers( const numbers<N,B,T>& old);
   ~numbers( void );
 
-  numbers<2*N, B, T> mul( numbers<N,B,T> A );
+  //numbers<2*N, B, T> mul( numbers<N,B,T> A );
   std::ostream& write( std::ostream& os ) const;
   bool operator<( const numbers<N,B,T>& A ) const;
   bool operator>( const numbers<N,B,T>& A ) const;
@@ -52,37 +52,26 @@ class numbers{
 
 //constructor
 template <size_t N, size_t B, class T>
-numbers<N, B, T>::numbers(const std::string& number):size_(0) {
+numbers<N, B, T>::numbers(const int number):size_(0) {
   if ( B < 2 ) {
     throw "exception, base cant be lower than 2";
   }
 
-  if ( check_string(number) ) {
+  //if ( check_string(number) ) {
 
-    if ( number[0] == '-' ) negative_ = true;
-    else negative_ = false;
-            
-
-    number_ = new T[N];
-
-    
-    if ( number_ == NULL) 
-      throw "Could not create array";
-    else {
-
-      if ( number[0] == '-' || number[0] == '+' )
-        to_base( std::stoi( std::string (number.begin() + 1, number.end() )));
-      else
-        to_base( std::stoi( number ));
-
-      fflush(stdout);
-
-    }
-  } else throw "Invalid number sent to constructor";
+  if ( number < 0 ) negative_ = true;
+  else negative_ = false;
+  
+  number_ = new T[N];
+  
+  if ( number_ == NULL) throw "Could not create array";
+  else {
+    if ( number < 0 ) to_base( -number );
+    else to_base( number );
+  }
 }
 
 //constructor de copia
-
 template <size_t N, size_t B, class T>
 numbers<N,B,T>::numbers(const numbers<N,B,T>& old) {
   copy(old);
@@ -300,12 +289,39 @@ bool numbers<N,B,T>::operator!=( const numbers& A ) const {
 
 template< size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::operator+( const numbers& A ) {
-  return sum( A );
+  numbers<N,B,T> X;
+
+  if (!negative_ && A.negative_ ) {
+    X = A;
+    return sub(X);
+  } else if ( !negative_ && !A.negative_ ) {
+    return sum(A);
+  } else if ( negative_ && A.negative_ ) {
+    X = sum(A);
+    X.negative_ = true;
+    return X;
+
+  } else if ( negative_ && !A.negative_ ) {
+    return A.sub(*this);
+  }
 }
 
 template< size_t N, size_t B, class T>
 numbers<N,B,T> numbers<N,B,T>::operator-( const numbers& A ) {
-  return sub( A );
+  numbers<N,B,T> X;
+
+  if (!negative_ && A.negative_ ) {
+    X = A;
+    return sum(X);
+  } else if ( !negative_ && !A.negative_ ) {
+    return sub(A);
+  } else if ( negative_ && A.negative_ ) {
+    return sub(A);
+  } else if ( negative_ && !A.negative_ ) {
+    X = A.sum(*this);
+    X.negative_ = true;
+    return X;
+  }
 }
 
 template< size_t N, size_t B, class T>
