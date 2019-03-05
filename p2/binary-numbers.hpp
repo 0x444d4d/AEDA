@@ -1,13 +1,16 @@
 #pragma once
 
-#define DE2G
+#define DEBG
+
+#include "numbers.hpp"
+//#include "numbers-helpers.hpp"
 
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 
 
-//PENDIENTE: clear();
+//PENDIENTE: ;
 //Resta de negativos.
 //Suma de negativos.
 
@@ -16,15 +19,17 @@ class numbers<N,2,T>{
 
   private:
   T* number_;
+  //bool negative_;
   unsigned short size_;
   
   public:
 
-  explicit numbers( const std::string& number = "0");
-  explicit numbers( const numbers<N,2,T>& old);
+  numbers( void ): size_(0) { number_ = new T[N]; }
+  explicit numbers( const std::string& number );
+  numbers( const numbers<N,2,T>& old);
   ~numbers( void );
 
-  //numbers<2*N, 2, T> mul( numbers<N,2,T> A );
+  numbers<2*N,2,T> mul( numbers<N,2,T> A );
   std::ostream& write( std::ostream& os ) const;
   bool operator<( const numbers<N,2,T>& A ) const;
   bool operator>( const numbers<N,2,T>& A ) const;
@@ -37,31 +42,25 @@ class numbers<N,2,T>{
   private:
 
   void to_base( int input, unsigned pos = 0);
-  void clear(void);
+  void complement( void );
+  //void clear(void); METODO NO USADO;
   numbers<N,2,T>& copy( const numbers<N,2,T>& old );
   bool less_than( numbers<N,2,T> A ) const;
   bool equals( numbers<N,2,T> A ) const;
   numbers<N, 2, T> sum( const numbers<N,2,T> A ) const;
   numbers<N, 2, T> sub( const numbers<N,2,T> A ) const;
-  
+ 
 };
-
-
 
 
 //constructor
 template <size_t N, class T>
 numbers<N, 2, T>::numbers(const std::string& number):size_(0) {
-  std::cout << "Numero binario" << std::endl;
-  if ( 2 < 2 ) {
-    throw "exception, base cant be lower than 2";
-  }
 
   if ( check_string(number) ) {
 
     number_ = new T[N];
 
-    
     if ( number_ == NULL) 
       throw "Could not create array";
     else {
@@ -74,7 +73,9 @@ numbers<N, 2, T>::numbers(const std::string& number):size_(0) {
       fflush(stdout);
 
     }
+
   } else throw "Invalid number sent to constructor";
+  complement();
 }
 
 //constructor de copia
@@ -102,15 +103,28 @@ numbers<N,2,T>::~numbers(void) noexcept(false) {
 template <size_t N, class T>
 void numbers<N, 2, T>::to_base(int input, unsigned pos ) {
   if ( input < 2 ) {
-    number_[pos] = int_to_char(input);
+    number_[pos] = input;
     ++size_;
   }
   else {
-    number_[pos]  = int_to_char(input % 2);
+    number_[pos]  = input % 2;
     ++size_;
     input = input / 2;
     to_base( input, ++pos );
   }
+}
+
+template <size_t N, class T>
+void numbers<N,2,T>::complement( void ) {
+  bool neg_flag = false;
+  for (unsigned short inx = 0; inx < size_; ++inx ) {
+    if ( neg_flag ) {
+      if ( number_[inx] == 0  ) number_[inx] = 1;
+      else number_[inx] = 0;
+    } else {
+      if ( number_[inx] == 1 ) neg_flag = true;
+    }
+  } 
 }
 
 //sum
@@ -119,32 +133,28 @@ numbers<N, 2, T> numbers<N, 2, T>::sum( const numbers A ) const {
   numbers<N, 2, T> C; //resultado de la suma.
   size_t result_size = size_ < A.size_ ? A.size_ : size_; //tamaño del resultado.
   unsigned aux; //resultado de la suma de dos digitos.
-  bool carry = false;
+  uint_fast8_t carry = 0;
   unsigned short inx;
 
 
   for ( inx = 0; inx < result_size; ++inx ) {
 
     if ( inx < A.size_ && inx < size_ )
-      aux = char_to_int( A.number_[inx] ) + char_to_int( number_[inx] );
+      aux = A.number_[inx] + number_[inx] + carry;
     else if ( inx < size_ ) 
-      aux = char_to_int( number_[inx] );
+      aux = number_[inx] + carry;
     else 
-      aux = char_to_int( A.number_[inx] );
+      aux = A.number_[inx] + carry;
     
-
-    if ( carry ) {
-      ++aux;
-      carry = false;
-    }
+    carry = 0;
 
     if ( aux < 2 ) {
-      C.number_[inx] = int_to_char(aux);
+      C.number_[inx] = aux;
       ++C.size_;
     } else {
-      C.number_[inx] = int_to_char( aux - 2 );
+      C.number_[inx] = ( aux - 2 );
       ++C.size_;
-      carry = true;
+      carry = 1;
     }
   }
 
@@ -153,7 +163,7 @@ numbers<N, 2, T> numbers<N, 2, T>::sum( const numbers A ) const {
     if ( inx >= N ) {
       throw "out of size: number to big for array size";
     } else {
-      C.number_[inx] = int_to_char(1) ;
+      C.number_[inx] = 1;
       ++C.size_;
     }
   }
@@ -165,17 +175,13 @@ template <size_t N, class T>
 numbers<N,2,T> numbers<N,2,T>::sub( const numbers A ) const {
   numbers<N,2,T> X,Y,C;
   size_t result_size = size_ < A.size_ ? A.size_ : size_;
-  bool carry = false;
+  uint_fast8_t borrow = 0;
   int aux = 0;
 
   if ( less_than(A) ) {
-    C.negative_ = true;
-
     X = A;
     Y = *this;
   } else {
-    C.negative_ = false;
-
     X = *this;
     Y = A;
   }
@@ -186,35 +192,33 @@ numbers<N,2,T> numbers<N,2,T>::sub( const numbers A ) const {
   for ( int inx = 0; inx < result_size; ++inx ) {
 
     if ( inx < X.size_ && inx < Y.size_ ) {
-      aux = char_to_int( X.number_[inx] ) - char_to_int( Y.number_[inx] );
+      aux =  X.number_[inx] - Y.number_[inx] - borrow;
     } else if ( inx < X.size_ ) {
-      aux = char_to_int( X.number_[inx] );
+      aux = X.number_[inx] - borrow;
     } else  {
-      aux = char_to_int( Y.number_[inx] );
+      aux = Y.number_[inx] - borrow;
     }
 
-    if ( carry ) --aux;
+    //if ( borrow ) --aux;
 
     if ( aux < 0 ) {
       aux += 2;
-      C.number_[inx] = int_to_char( aux );
+      C.number_[inx] = aux;
       ++C.size_;
-      carry = true;
+      borrow = 1;
     } else {
        
-      C.number_[inx] = int_to_char( aux );
+      C.number_[inx] = aux;
       ++C.size_;
-      carry = false;
+      borrow = 0;
     }
   }
     
   for (int inx = (C.size_ - 1); inx >= 0; --inx ) {
-    if ( check_char_range( C.number_[inx] ) == false ) --C.size_;
-    else {
-      if ( char_to_int(C.number_[inx]) == 0  ) --C.size_;
-      else break;
-    }
-  }   
+    if ( C.number_[inx] == 0 ) --C.size_;
+    else break;
+  }
+
   return C;
 }
 
@@ -240,7 +244,7 @@ std::ostream& numbers<N, 2, T>::write( std::ostream& os ) const {
     os << 0;
   } else {
     for (int inx = (size_ - 1); inx >= 0; --inx ){
-      os << number_[inx];
+      os << int_to_char( number_[inx] );
     }
   }
 
@@ -312,3 +316,4 @@ template< size_t N, class T>
 std::ostream& operator<<(std::ostream& os, const numbers<N,2,T>& A) {
   return A.write(os);
 }
+

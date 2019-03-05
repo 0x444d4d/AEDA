@@ -1,5 +1,5 @@
 #include "numbers.hpp"
-#include "binary_numbers.hpp"
+#include "binary-numbers.hpp"
 
 template<int N, int B, class T = char>
 void test_number( std::string v1, std::string v2 );
@@ -63,5 +63,4 @@ void test_number( std::string input1, std::string input2) {
       std::cout << "El numero 1 es menor" << std::endl;
     else
       std::cout << "El numero 1 no es menor" << std::endl;
-    
 }
