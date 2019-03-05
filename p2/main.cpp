@@ -44,7 +44,7 @@ void test_number( int input1, int input2) {
 
     std::cout << "suma" << std::endl;
     std::cout << v1 + v2 << std::endl;
-    //std::cout << std::endl;
+    std::cout << std::endl;
 
     std::cout << "resta" << std::endl;
     std::cout << v1 - v2 << std::endl;;
@@ -63,4 +63,5 @@ void test_number( int input1, int input2) {
       std::cout << "El numero 1 es menor" << std::endl;
     else
       std::cout << "El numero 1 no es menor" << std::endl;
+    std::cout << std::endl;
 }

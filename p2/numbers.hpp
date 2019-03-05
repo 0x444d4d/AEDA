@@ -6,11 +6,9 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "number_exeptions.hpp"
 #include "numbers-helpers.hpp"
 
-//PENDIENTE: ;
-//Resta de negativos.
-//Suma de negativos.
 
 template <size_t N, size_t B, class T = char>
 class numbers{
@@ -27,7 +25,6 @@ class numbers{
   numbers( const numbers<N,B,T>& old);
   ~numbers( void );
 
-  //numbers<2*N, B, T> mul( numbers<N,B,T> A );
   std::ostream& write( std::ostream& os ) const;
   bool operator<( const numbers<N,B,T>& A ) const;
   bool operator>( const numbers<N,B,T>& A ) const;
@@ -40,7 +37,6 @@ class numbers{
   private:
 
   void to_base( int input, unsigned pos = 0);
-  //void clear(void); METODO NO USADO;
   numbers<N,B,T>& copy( const numbers<N,B,T>& old );
   bool less_than( numbers<N,B,T> A ) const;
   bool equals( numbers<N,B,T> A ) const;
@@ -54,11 +50,8 @@ class numbers{
 template <size_t N, size_t B, class T>
 numbers<N, B, T>::numbers(const int number):size_(0) {
   if ( B < 2 ) {
-    throw "exception, base cant be lower than 2";
+    throw base_exception(); 
   }
-
-  //if ( check_string(number) ) {
-
   if ( number < 0 ) negative_ = true;
   else negative_ = false;
   
@@ -86,7 +79,7 @@ numbers<N,B,T>::~numbers(void) noexcept(false) {
     delete number_;
     number_ = NULL;
   } else {
-    throw "Double free";
+    throw double_free();
   }
   
 }
@@ -140,7 +133,7 @@ numbers<N, B, T> numbers<N, B, T>::sum( const numbers A ) const {
   if ( carry ) {
 
     if ( inx >= N ) {
-      throw "out of size: number to big for array size";
+      throw out_of_range();
     } else {
       C.number_[inx] = 1;
       ++C.size_;
@@ -212,7 +205,7 @@ numbers<N,B,T>& numbers<N,B,T>::copy( const numbers<N,B,T>& old) {
   number_ = new T[N];
 
   if ( number_ == NULL) 
-    throw "Could not create array";
+    throw std::bad_alloc();
   else {
     for (int inx = 0; inx < size_; ++inx)
       number_[inx] = old.number_[inx];

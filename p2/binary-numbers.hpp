@@ -27,7 +27,7 @@ class numbers<N,2,T>{
   numbers( void );
   explicit numbers( const int number );
   numbers( const numbers<N,2,T>& old);
-  ~numbers( void );
+  //~numbers( void );
 
   numbers<2*N,2,T> mul( numbers<N,2,T> A );
   std::ostream& write( std::ostream& os ) const;
@@ -66,17 +66,15 @@ numbers<N, 2, T>::numbers(const int number):size_(0) {
     number_ = new T[N];
 
     if ( number_ == NULL) 
-      throw "Could not create array";
+      throw std::bad_alloc();
     else {
       fill(0);
 
       if ( number < 0 ) {
-        //fill(1);
         to_base( -number );
         complement();
       }
       else{
-        //fill(0);
         to_base( number );
       }
     }
@@ -87,6 +85,7 @@ template <size_t N, class T>
 numbers<N,2,T>::numbers(const numbers<N,2,T>& old) {
   copy(old);
 }
+
 
 
 //destructor
@@ -102,12 +101,14 @@ numbers<N,2,T>::~numbers(void) noexcept(false) {
   
 }
 
+
 //fill
 template <size_t N, class T>
 void numbers<N,2,T>::fill( int i ) {
   for (int inx = 0; inx < N; ++inx)
     number_[inx] = i;
 }
+
 
 //to_base
 template <size_t N, class T>
@@ -123,6 +124,7 @@ void numbers<N, 2, T>::to_base(int input, unsigned pos ) {
     to_base( input, ++pos );
   }
 }
+
 
 template <size_t N, class T>
 void numbers<N,2,T>::complement( void ) {
@@ -199,6 +201,7 @@ std::ostream& numbers<N, 2, T>::write( std::ostream& os ) const {
   return os;
 }
 
+
 template<size_t N, class T> 
 bool numbers<N,2,T>::less_than(numbers A) const {
   if ( size_ < A.size_ ) return true;
@@ -210,6 +213,8 @@ bool numbers<N,2,T>::less_than(numbers A) const {
   }
   return false;
 }
+
+
 
 template<size_t N, class T> 
 bool numbers<N,2,T>::equals(numbers A) const {
