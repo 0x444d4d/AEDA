@@ -20,7 +20,7 @@ class Celda {
     public:
     Celda() : nDNI_(0) {}
     Celda(uint16_t size) : nDNI_(0), size_(size) { vClave = new T[size]; }
-    ~Celda(void) { delete vClave; }
+    //~Celda(void) { delete vClave; }
     void resize( uint16_t size ) { vClave = new T[size]; size_ = size; }
     bool Buscar( T clave );
     bool Insertar( T clave );

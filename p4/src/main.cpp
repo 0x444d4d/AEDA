@@ -16,9 +16,9 @@ int main(void) {
     std::vector<DNI> vDNI;
     Contador maincount;
     int cellsize, nDNI, load;
-    int media = 0,maximo = 0, minimo = std::numeric_limits<int>::max();
+    unsigned  media = 0,maximo = 0, minimo = std::numeric_limits<int>::max();
     float factor;
-    Tabla<DNI> hash_table( uint16_t(100), uint16_t(100) ); 
+    Tabla<DNI> hash_table( uint16_t(100), uint16_t(100), modulo, cuadratica ); 
 
 
     std::cout << "Tamaño de la tabla: " << std::endl;
@@ -31,6 +31,7 @@ int main(void) {
     std::cin >> factor;
     std::cin.get();
 
+    //hash_table.resize(nDNI, cellsize);
     
     load = factor * nDNI * cellsize;
     for (int i = 0; i < 2*load; ++i) {
@@ -46,7 +47,7 @@ int main(void) {
     maincount.start ();
 
     for (int i = 0; i < load; ++i) {
-        static int aux;
+        static unsigned aux;
         hash_table.Buscar( vDNI[i] );
 
         aux = maincount.get();
@@ -67,7 +68,7 @@ int main(void) {
     
 
     for (int i = load; i < 2*load; ++i) {
-        static int aux;
+        static unsigned aux;
         //std::cout << hash_table.Buscar ( vDNI[i]  ) << std::endl;
         hash_table.Buscar ( vDNI[i]  );
         aux = maincount.get();
@@ -84,8 +85,6 @@ int main(void) {
     std::cout << "Maximo: " << maximo << std::endl;
     std::cout << "Media: " << media/load << std::endl;
 
-    std::cout << "Numero de pruebas: " << std::endl;
-    std::cout << maincount.get() << std::endl;
     //aeda::FDispersionBase<aeda::DNI>* dispersion = new aeda::FDispersionPAleatoria<aeda::DNI>(100);
 }
 
