@@ -18,7 +18,7 @@ int main(void) {
     int cellsize, nDNI, load;
     unsigned  media = 0,maximo = 0, minimo = std::numeric_limits<int>::max();
     float factor;
-    Tabla<DNI> hash_table( uint16_t(100), uint16_t(100), modulo, cuadratica ); 
+    Tabla<DNI> hash_table( uint16_t(100), uint16_t(100), modulo, lineal ); 
 
 
     std::cout << "Tamaño de la tabla: " << std::endl;
@@ -31,7 +31,7 @@ int main(void) {
     std::cin >> factor;
     std::cin.get();
 
-    //hash_table.resize(nDNI, cellsize);
+    hash_table.resize(nDNI, cellsize);
     
     load = factor * nDNI * cellsize;
     for (int i = 0; i < 2*load; ++i) {
@@ -58,9 +58,11 @@ int main(void) {
     }
 
     std::cout << "----Busqueda----" << std::endl;
-    std::cout << "Minimo: " << minimo << std::endl;
-    std::cout << "Maximo: " << maximo << std::endl;
-    std::cout << "Media: " << media/load << std::endl;
+    std::cout << "Celdas\tTamaño de celda\tCarga\t" <<  std::endl;
+    std::cout << nDNI <<  "\t\t" << cellsize << "\t" << load << std::endl;
+    std::cout << "Minimo\tMaximo\tMedia" << std::endl;
+    std::cout << minimo << "\t" << maximo << "\t" << media/load << std::endl;
+    std::cout << std::endl;
 
 
     minimo = std::numeric_limits<int>::max();
@@ -69,7 +71,6 @@ int main(void) {
 
     for (int i = load; i < 2*load; ++i) {
         static unsigned aux;
-        //std::cout << hash_table.Buscar ( vDNI[i]  ) << std::endl;
         hash_table.Buscar ( vDNI[i]  );
         aux = maincount.get();
         if (aux < minimo) minimo = aux;
@@ -80,12 +81,12 @@ int main(void) {
 
     maincount.stop ();
 
-    std::cout << "----Insersion----" << std::endl;
-    std::cout << "Minimo: " << minimo << std::endl;
-    std::cout << "Maximo: " << maximo << std::endl;
-    std::cout << "Media: " << media/load << std::endl;
-
-    //aeda::FDispersionBase<aeda::DNI>* dispersion = new aeda::FDispersionPAleatoria<aeda::DNI>(100);
+    std::cout << "----Insercion----" << std::endl;
+    std::cout << "Celdas\tTamaño de celda\tCarga\t" <<  std::endl;
+    std::cout << nDNI <<  "\t\t" << cellsize << "\t" << load << std::endl;
+    std::cout << "Minimo\tMaximo\tMedia" << std::endl;
+    std::cout << minimo << "\t" << maximo << "\t" << media/load << std::endl;
+    std::cout << std::endl;
 }
 
 
