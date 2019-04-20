@@ -17,6 +17,7 @@ class DNI {
 
     operator unsigned long(void);
     bool operator<(DNI right);
+    bool operator>(DNI right);
     bool operator==(DNI right);
     friend std::ostream& operator << (std::ostream& os, const DNI& data);
 
@@ -26,10 +27,6 @@ class DNI {
 
 
 DNI::DNI() { 
-    #ifndef RAND
-    //srand(time(NULL));
-    #define RAND
-    #endif
 
     for (int inx = 0; inx < 9; ++inx) {
         id_[inx] = (rand() % 10) + 48;
@@ -64,6 +61,11 @@ bool DNI::operator<( DNI right ) {
     return menor_que(right);
 }
 
+bool DNI::operator>( DNI right ) {
+  if ( menor_que( right )) return false;
+  else if ( (*this) == right  ) return true;
+  else return true;
+}
 
 std::ostream& operator<<(std::ostream& os, const DNI& data) {
    for ( char digit : data.id_ ) {
