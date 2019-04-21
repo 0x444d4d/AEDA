@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 //Requirements for Clave:
+//operator >
 //operator <
 //operator =
 
