@@ -1,8 +1,10 @@
 #define DEM
-//#include "../inc/select.hpp"
-#include "../inc/shake.hpp"
-#include "../inc/merge.hpp"
 #include "../inc/dni-t.hpp"
+//#include "../inc/select.hpp"
+#include "../inc/heap.hpp"
+#include "../inc/shell.hpp"
+//#include "../inc/shake.hpp"
+//#include "../inc/merge.hpp"
 
 
 int main(void) {
@@ -29,6 +31,9 @@ int main(void) {
 
   std::cout << std::endl;
 
-  merge_sort<aeda::DNI>( v1, v1.size() );
+  shell_sort<aeda::DNI>( v1, v1.size() );
+
+  for ( auto i : v1 )
+    std::cout << i << "\n";
 
 }
