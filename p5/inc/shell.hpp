@@ -1,4 +1,3 @@
-
 #ifndef SHELL
 #define SHELL
 
@@ -14,7 +13,7 @@ void shell_sort ( std::vector<Clave>& Vect, unsigned int size ) {
             Clave temp = Vect[i];
             int j;
 
-            for ( j = i; j >= gap && Vect[j - gap] > temp; j -=gap ) {
+            for ( j = i; ( j >= gap ) && ( Vect[j - gap] > temp ); j -= gap ) {
                 Vect[j] = Vect[j - gap];
             }
 

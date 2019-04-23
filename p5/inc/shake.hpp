@@ -1,5 +1,6 @@
 #ifndef SHAKE
 #define SHAKE
+
 #include <vector>
 #include <iostream>
 
@@ -7,7 +8,7 @@
 template< class Clave >
 unsigned int find_min ( std::vector<Clave>& Vect, unsigned int left, unsigned int right ) {
   unsigned int min = left;
-  for ( unsigned int i = left; i <= right; ++i) {
+  for ( unsigned int i = left; i <= right; ++i ) {
     if ( Vect[i] < Vect[min] ) min = i;
   }
   
@@ -18,7 +19,7 @@ unsigned int find_min ( std::vector<Clave>& Vect, unsigned int left, unsigned in
 template < class Clave >
 unsigned int find_max ( std::vector<Clave>& Vect, unsigned int left, unsigned int right ) {
   unsigned int max = right;
-  for ( unsigned int i = right; i >= left; --i) {
+  for ( unsigned int i = right; i >= left; --i ) {
     if ( Vect[i] > Vect[max] ) max = i;
   }
   

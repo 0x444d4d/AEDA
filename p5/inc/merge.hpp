@@ -1,6 +1,6 @@
-
 #ifndef MERGE
 #define MERGE
+
 #include <vector>
 #include <iostream>
 
@@ -87,9 +87,11 @@ void merge_sort ( std::vector<Clave>& Vect, unsigned int size ) {
   divide( Vect, 0, Vect.size() - 1 );
 
   std::cout << std::endl;
+  /*
   for ( auto a : Vect ) {
     std::cout << a << std::endl;
   }   
+  */
 }
 
 #endif

@@ -1,5 +1,5 @@
-#ifdef DEM
-#define DEM
+#ifndef HEAP
+#define HEAP
 
 #include <iostream>
 #include <vector>

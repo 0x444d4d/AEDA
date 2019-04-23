@@ -2,31 +2,38 @@
 //#include <random.h>
 #include <iostream>
 #include <time.h>
-//#include "contador.hpp"
+#include "contador.hpp"
 
 namespace aeda {
 
+template < unsigned id >
 class DNI {
-        
+
     private:
-    char id_ [10];
-    //Contador cont;
-        
+        char id_ [10];
+        Contador<id> cont;
+
     public:
-    DNI();
+        DNI();
 
-    operator unsigned long(void);
-    bool operator<(DNI right);
-    bool operator>(DNI right);
-    bool operator==(DNI right);
-    friend std::ostream& operator << (std::ostream& os, const DNI& data);
+        operator unsigned long(void);
+        bool operator<(DNI right);
+        bool operator>(DNI right);
+        bool operator==(DNI right);
+        friend std::ostream& operator<<(std::ostream& os, const DNI<id>& data) {
+            for ( char digit : data.id_ ) {
+                std::cout << digit;
+            }
+            return os;
+        }
 
     private:
-    bool menor_que( DNI right );
+        bool menor_que( DNI right );
 };
 
 
-DNI::DNI() { 
+template < unsigned id >
+DNI<id>::DNI() { 
 
     for (int inx = 0; inx < 9; ++inx) {
         id_[inx] = (rand() % 10) + 48;
@@ -34,12 +41,14 @@ DNI::DNI() {
     id_[9] = '\0';
 }
 
-DNI::operator unsigned long(void) {
+template < unsigned id >
+DNI<id>::operator unsigned long(void) {
     return atol(id_);
 }
 
-bool DNI::operator==(DNI right) {
-    //cont++;
+template < unsigned id >
+bool DNI<id>::operator==(DNI right) {
+    cont++;
     for ( int i = 0; i < 9; ++i ) {
         if ( id_[i] != right.id_[i])
             return false;
@@ -47,7 +56,8 @@ bool DNI::operator==(DNI right) {
     return true;
 }
 
-bool DNI::menor_que( DNI right ) {
+template < unsigned id >
+bool DNI<id>::menor_que( DNI right ) {
     for (short inx = 0; inx < 9; ++inx) {
         if ( id_[inx] < right.id_[inx] ) return true;
         else if ( id_[inx] > right.id_[inx] ) return false;
@@ -55,23 +65,30 @@ bool DNI::menor_que( DNI right ) {
     return false;
 }
 
-bool DNI::operator<( DNI right ) {
+template < unsigned id >
+bool DNI<id>::operator<( DNI right ) {
 
-    //cont++;
+    cont++;
     return menor_que(right);
 }
 
-bool DNI::operator>( DNI right ) {
-  if ( menor_que( right )) return false;
-  else if ( (*this) == right  ) return true;
-  else return true;
+template < unsigned id >
+bool DNI<id>::operator>( DNI right ) {
+
+    cont++;
+    if ( menor_que( right )) return false;
+    else if ( (*this) == right  ) return true;
+    else return true;
 }
 
-std::ostream& operator<<(std::ostream& os, const DNI& data) {
-   for ( char digit : data.id_ ) {
-       std::cout << digit;
-   }
-   return os;
+/*
+template < unsigned id >
+std::ostream& operator<<(std::ostream& os, const DNI<id>& data) {
+    for ( char digit : data.id_ ) {
+        std::cout << digit;
+    }
+    return os;
 }
+*/
 
 }
