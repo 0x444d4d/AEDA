@@ -5,9 +5,11 @@
 #include <iostream>
 
 template < class Clave >
-void shell_sort ( std::vector<Clave>& Vect, unsigned int size ) {
+void shell_sort ( std::vector<Clave>& Vect, unsigned int size, float factor = 0.5 ) {
+    
+    unsigned int delta = size * factor;
 
-    for ( unsigned int gap = size/2; gap > 0; gap /= 2 ) {
+    for ( unsigned int gap = size/2; gap > 0; gap *= factor ) {
         for ( unsigned int i = gap; i < size; ++i ) {
 
             Clave temp = Vect[i];
@@ -19,6 +21,19 @@ void shell_sort ( std::vector<Clave>& Vect, unsigned int size ) {
 
             Vect[j] = temp;
         }
+
+        #ifdef DEM
+        std::cout << "Vector:\n";
+        for ( auto a : Vect ) {
+            std::cout << a << "\n";
+        }
+
+        std::cout << "Pulse una tecla para continuar" << std::flush;
+        std::cin.get();
+
+        std::cout << "\n\n\n" << std::flush;
+        #endif
+
     }
 }
 

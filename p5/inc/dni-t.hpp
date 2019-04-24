@@ -6,7 +6,7 @@
 
 namespace aeda {
 
-template < unsigned id >
+template < unsigned id = 0 >
 class DNI {
 
     private:
@@ -48,6 +48,11 @@ DNI<id>::operator unsigned long(void) {
 
 template < unsigned id >
 bool DNI<id>::operator==(DNI right) {
+
+#ifdef DEM
+    std::cout << (*this) << " = = " << right << std::endl;
+#endif
+
     cont++;
     for ( int i = 0; i < 9; ++i ) {
         if ( id_[i] != right.id_[i])
@@ -68,12 +73,20 @@ bool DNI<id>::menor_que( DNI right ) {
 template < unsigned id >
 bool DNI<id>::operator<( DNI right ) {
 
+    #ifdef DEM
+    std::cout << (*this) << " < " << right << std::endl;
+    #endif
+
     cont++;
     return menor_que(right);
 }
 
 template < unsigned id >
 bool DNI<id>::operator>( DNI right ) {
+
+    #ifdef DEM
+    std::cout << (*this) << " > " << right << std::endl;
+    #endif
 
     cont++;
     if ( menor_que( right )) return false;

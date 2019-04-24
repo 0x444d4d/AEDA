@@ -10,56 +10,80 @@
 
 using namespace aeda;
 
+enum sortMethod { Select, Cocktail, Merge, Heap, Shell };
+
 int main( int argc, char* argv[] ) {
+
+    unsigned short sel = atoi( argv[3] );
+    unsigned int size = atoi(argv[1]);
+    unsigned int iter = atoi(argv[2]);
+    aeda::Contador<> contador;
+    contador.start();
+    std::vector<aeda::DNI<> > v1;
+    unsigned minimo = -1, media = 0, maximo = 0;
+    sortMethod opt;
+
+
     srand( time(nullptr) );
 
-    unsigned int size = atoi(argv[1]);
 
-    aeda::Contador<0> contadorSelect;
-    aeda::Contador<1> contadorCocktail;
-    aeda::Contador<2> contadorMerge;
-    aeda::Contador<3> contadorHeap;
-    aeda::Contador<4> contadorShell;
+    #ifdef DEM
+    iter = 1;
+    #endif
 
-    contadorSelect.start();
-    contadorCocktail.start();
-    contadorMerge.start();
-    contadorHeap.start();
-    contadorShell.start();
 
-    std::vector<aeda::DNI<0>> v1;
-    std::vector<aeda::DNI<1>> v2;
-    std::vector<aeda::DNI<2>> v3;
-    std::vector<aeda::DNI<3>> v4;
-    std::vector<aeda::DNI<4>> v5;
-
-    for ( unsigned int i = 0; i < size; ++i ) {
-        v1.push_back( DNI<0>() );
-        v2.push_back( DNI<1>() );
-        v3.push_back( DNI<2>() );
-        v4.push_back( DNI<3>() );
-        v5.push_back( DNI<4>() );
+    switch( sel ) {
+        case 0:
+            std::cout << "Select\n";
+            break;
+        case 1:
+            std::cout << "Cocktail\n";
+            break;
+        case 2:
+            std::cout << "Merge\n";
+            break;
+        case 3:
+            std::cout << "Heap\n";
+            break;
+        case 4:
+            std::cout << "Shell\n";
+            break;
     }
 
-    for (unsigned int i = 0; i < 10; ++i) {
-        select_sort<aeda::DNI<0>>( v1, v1.size() );
-        shake_sort<aeda::DNI<1>>( v2, v2.size() );
-        merge_sort<aeda::DNI<2>>( v3, v3.size() );
-        heap_sort<aeda::DNI<3>>( v4, v4.size() );
-        shell_sort<aeda::DNI<4>>( v5, v5.size() );
+    for (unsigned int i = 0; i < iter; ++i) {
+        for ( unsigned int i = 0; i < size; ++i ) {
+            v1.push_back( DNI<>() );
+        }
+
+        switch ( sel ) {
+            case Select:
+                select_sort<aeda::DNI<>>( v1, v1.size() );
+                break;
+            case Cocktail:
+                shake_sort<aeda::DNI<>>( v1, v1.size() );
+                break;
+            case Merge:
+                merge_sort<aeda::DNI<>>( v1, v1.size() );
+                break;
+            case Heap:
+                heap_sort<aeda::DNI<>>( v1, v1.size() );
+                break;
+            case Shell:
+                if ( argc == 5 ) shell_sort<aeda::DNI<>>( v1, v1.size(), atof(argv[4]) );
+                else shell_sort<aeda::DNI<>>( v1, v1.size() );
+                break;
+        }
+
+        minimo = contador.get() > minimo ? minimo : contador.get();
+        maximo = contador.get() < maximo ? maximo : contador.get();
+        media += contador.get();
+
+        v1.clear();
+        contador.reset();
+
     }
-
-
-    std::cout << "Comparaciones Select Sort:  "  << contadorSelect.get() << std::endl;
-    std::cout << "Comparaciones Cocktail Sort:  "  << contadorCocktail.get() << std::endl;
-    std::cout << "Comparaciones Merge Sort:  "  << contadorMerge.get() << std::endl;
-    std::cout << "Comparaciones Heap Sort:  "  << contadorHeap.get() << std::endl;
-    std::cout << "Comparaciones Shell Sort:  "  << contadorShell.get() << std::endl;
-
-    contadorSelect.start();
-    contadorCocktail.start();
-    contadorMerge.start();
-    contadorHeap.start();
-    contadorShell.start();
+    media /= iter;
+    std::cout << "\t\t\t\tminimo\t\tmedia\t\tmaximo\n";
+    std::cout << "Comparaciones:  " << minimo << "\t\t" << media << "\t\t" << maximo << std::endl;
 
 }

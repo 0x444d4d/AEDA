@@ -30,11 +30,29 @@ void heap_sort ( std::vector<Clave>& Vect, unsigned int size ) {
 
     for ( long i = size/2 - 1; i >= 0 ; --i ) {
         heap( Vect, size, i );
+
+        #ifdef DEM
+        std::cout << "Vector:" << std::endl;
+        for (auto a : Vect) {
+            std::cout << a << std::endl;
+        }
+        std::cout << "Pulse una tecla para continuar" << std::endl;
+        std::cin.get();
+        #endif
     }
 
     for ( long i = size - 1; i >= 0; --i ) {
         swap(Vect, 0, i);
         heap(Vect, i, 0);
+
+        #ifdef DEM
+        std::cout << "Vector:" << std::endl;
+        for (auto a : Vect) {
+            std::cout << a << std::endl;
+        }
+        std::cout << "Pulse una tecla para continuar" << std::endl;
+        std::cin.get();
+        #endif
     }
 
 }

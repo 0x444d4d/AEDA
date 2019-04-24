@@ -10,24 +10,9 @@ void swap ( std::vector<Clave>& Vect, unsigned int left, unsigned int middle, un
   std::vector<Clave> v1( Vect.begin() + left, Vect.begin() + ( middle + 1 ));
   std::vector<Clave> v2( Vect.begin() + (middle + 1), Vect.begin() + ( right + 1 ));
 
-
-  /*
-  Clave* arr1 = new Clave[l];
-  Clave* arr2 = new Clave[r];
-
-  for (int i = left; i <= middle; ++i) {
-    arr1[i - left] = Vect[i];
-    std::cout << arr1[i - left] << std::endl;
-  }   
-
-  for (int i = middle + 1; i <= right; ++i) {
-    arr2[i - middle + 1] = Vect[i];
-    std::cout << arr2[i - middle + 1] << std::endl;
-  }   
-  */
-
   
   #ifdef DEM
+  std::cout << "Vectores:" << std::endl;
   std::cout << "v1: " << v1.size() << std::endl;
   for (auto i : v1 ) {
     std::cout << i << std::endl;
@@ -36,6 +21,9 @@ void swap ( std::vector<Clave>& Vect, unsigned int left, unsigned int middle, un
   for (auto i : v2 ) {
     std::cout << i << std::endl;
   }   
+
+  std::cout << "Pulse una tecla para continuar\n\n\n" << std::flush;
+  std::cin.get();
   #endif
 
   
@@ -64,7 +52,7 @@ void swap ( std::vector<Clave>& Vect, unsigned int left, unsigned int middle, un
     Vect[left] = v2[i];
     ++left;
   }   
-  
+
 
 }
 
@@ -85,13 +73,6 @@ void divide ( std::vector<Clave>& Vect, unsigned int left, unsigned int right ) 
 template < class Clave >
 void merge_sort ( std::vector<Clave>& Vect, unsigned int size ) {
   divide( Vect, 0, Vect.size() - 1 );
-
-  std::cout << std::endl;
-  /*
-  for ( auto a : Vect ) {
-    std::cout << a << std::endl;
-  }   
-  */
 }
 
 #endif
