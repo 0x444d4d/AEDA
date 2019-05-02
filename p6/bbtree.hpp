@@ -1,4 +1,7 @@
 #include "node.hpp"
+#include <iostream>
+#include <vector>
+#include <queue>
 
 namespace aeda {
 
@@ -16,6 +19,9 @@ class bbtree {
     bool remove( node<T>* &node, T data );
 
     bool replace( node<T>* &node );
+
+    void printTree(void);
+    void make_queue( std::vector<node<T>*> nodeVect, std::queue<T> &printQueue, std::vector<unsigned> &sizes);
 };
 
 
@@ -28,11 +34,11 @@ bool bbtree<T>::insert(T data) {
 template <class T>
 bool bbtree<T>::insert( node<T>* &node, T data ) {
     if ( node == nullptr ) {
-        node = new node<T>(data);
+        node = new aeda::node<T>(data);
         return true;
     }
-    if ( *node.data_ < data  ) insert( *node.left_, data);
-    if ( *node.data_ > data  ) insert( *node.right_, data);
+    if ( (*node)  < data  ) insert( node->right_, data);
+    if ( (*node) > data  ) insert( node->left_, data);
     return 0;
     
 }
@@ -48,32 +54,92 @@ template <class T>
 bool bbtree<T>::remove( node<T>* &node, T data ) {
     if (node == nullptr) return false;
 
-    if ( *node.data_ < data ) {
-        if ( *node.right == data ) return replace( *node.right );
-        return remove( *node.right, data );
+    if ( *node < data ) {
+        if ( *(node->right_ ) == data ) return replace( node->right_ );
+        return remove( node->right_, data );
     } 
-    if (*node.data_ > data) {
-        if ( *node.left == data ) return replace( *node.left );
-        return remove( *node.left, data );
+    if (*node > data) {
+        if ( *(node->left_) == data ) return replace( node->left_ );
+        return remove( node->left_, data );
     }
+    return false;
 }
 
 
 template <class T>
 bool bbtree<T>::replace( node<T>* &node ) {
-    node<T>* aux;
-    if ( *node.left == nullptr && *node.right == nullptr ) {
+    aeda::node<T>* aux;
+    aeda::node<T>* tmp;
+    aeda::node<T>* last;
+
+    if ( node->left_ == nullptr && node->right_ == nullptr ) {
+        delete node;
         node = nullptr;
         return true;
     }
 
     aux = node;
-    if ( *node.left != nullptr ) node = *node.left;
-    if ( *node.right != nullptr ) node = *node.right;
+    if ( node->left_ != nullptr && node->right_ != nullptr ) {
+//Code here
+    } else {
+        if ( node->left_ == nullptr ) node = node->right_;
+        else if ( node->right_ == nullptr ) node = node->left_;
+    }
+
     delete aux;
+    aux = nullptr;
+
     return true;
 }
 
+
+template <class T>
+void bbtree<T>::printTree(void) {
+    std::queue<T> printQueue;
+    std::vector<node<T>*> nodeVect;
+    nodeVect.push_back(root_);
+    std::vector<unsigned> sizes;
+    unsigned vpos = 0;
+    //printQueue.push(*root_);
+
+    make_queue(nodeVect, printQueue, sizes);
+
+    while (printQueue.size() > 0) {
+        std::cout << vpos << ": ";
+        for ( unsigned inx = 0; inx < sizes[vpos]; ++inx ) {
+            std::cout << "[" <<printQueue.front() << "] ";
+            printQueue.pop();
+        }
+        ++vpos;
+        std::cout << std::endl;
+    }
+/*
+    visited.push_back( root_->left_);
+    visited.push_back( root_->right_);
+
+    printQueue.push(root_->left_);
+    printQueue.push(root_->right_);
+*/
+}
+
+template <class T>
+void bbtree<T>::make_queue( std::vector<node<T>*> nodeVect, std::queue<T> &printQueue, std::vector<unsigned> &sizes ) {
+    std::vector<node<T>*> newVect;
+
+    if (nodeVect.size() == 0 ) return;
+
+    sizes.push_back( nodeVect.size() );
+    for ( auto node: nodeVect ) {
+        if (node != nullptr) {
+
+            printQueue.push(*node);
+            newVect.push_back(node->left_);
+            newVect.push_back(node->right_);
+        } else --sizes[sizes.size() - 1];
+    }
+    
+    make_queue( newVect, printQueue, sizes );    
+}
 
 
 }//namespace
