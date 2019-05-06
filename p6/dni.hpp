@@ -4,6 +4,7 @@
 #include <time.h>
 #include "contador.hpp"
 
+
 namespace aeda {
 
 template < unsigned id = 0 >

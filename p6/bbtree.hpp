@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+//#include "dni.hpp"
 
 namespace aeda {
 
@@ -14,6 +15,8 @@ class bbtree {
     bbtree(void): root_(nullptr) {}
     bool insert( T data );
     bool insert( node<T>* &node, T data );
+
+    bool search( T data );
 
     bool remove( T data );
     bool remove( node<T>* &node, T data );
@@ -81,6 +84,20 @@ bool bbtree<T>::replace( node<T>* &node ) {
     aux = node;
     if ( node->left_ != nullptr && node->right_ != nullptr ) {
 //Code here
+        node = node->left_; 
+        aeda::node<T>* last = node;
+        tmp = node;
+        
+        while ( tmp != nullptr ) {
+            last = tmp;
+            if ( *aux->right_ < *last ) tmp = tmp->left_;
+            if ( *aux->right_ > *last ) tmp = tmp->right_;
+        }
+
+        if ( *aux->right_  < *last ) last->left_ = aux->right_;
+        else if ( *aux->right_  > *last) last->right_ = aux->right_;
+        else return false;
+
     } else {
         if ( node->left_ == nullptr ) node = node->right_;
         else if ( node->right_ == nullptr ) node = node->left_;
