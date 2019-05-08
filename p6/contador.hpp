@@ -6,6 +6,7 @@ namespace aeda {
 //template se usa para crear distintas clases de forma que
 //puedan existir varios contadores que no compartan los atributos
 //count_ y iter_.
+
 template < unsigned id = 0 >
 class Contador {
 

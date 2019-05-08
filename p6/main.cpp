@@ -64,22 +64,63 @@ int main(void) {
 
 #ifndef DEM
 
-    aeda::Contador<0> counter;
+    aeda::bbtree<aeda::DNI<>> tree;
+
+    unsigned minimo = -1, media = 0, maximo = 0; 
+    unsigned int nPruebas;
+    std::vector<aeda::DNI<>> bPruebas;
+    aeda::Contador<> counter;
+
+    std::cout << "Numero de pruebas\n";
+    std::cin >> nPruebas;
+    std::cin.get();
+
+    bPruebas.resize( nPruebas );
+
+
+    for ( unsigned int i = 0; i < nPruebas; ++i) {
+        bPruebas[i] = aeda::DNI<>();
+        tree.insert( bPruebas[i] );
+    }
+
     counter.start();
 
+    std::cout << "Estadísticas de insersion\n";
+
+    for ( unsigned int i = 0; i < nPruebas; ++i ) {
+        tree.insert(aeda::DNI<>());
+
+        if ( minimo > counter.get() ) minimo = counter.get();
+        if ( maximo < counter.get() ) maximo = counter.get();
+
+        media += counter.get();
+        counter.reset();
+    }
+
+    std::cout << "minimo: " << minimo << "\n";
+    std::cout << "media: " << media / nPruebas << "\n";
+    std::cout << "maximo: " << maximo << "\n";
+
+    minimo = -1;
+    maximo = media = 0;
+
+    std::cout << "Estadísticas de busqueda\n";
+
+    for ( unsigned int i = 0; i < nPruebas; ++i ) {
+        tree.search( bPruebas[i] );
+        if ( minimo > counter.get() ) minimo = counter.get();
+        if ( maximo < counter.get() ) maximo = counter.get();
+
+        media += counter.get();
+        counter.reset();
+
+    }
     counter.stop();
-    //tree.insert(10);
-    //tree.insert(3);
-    //tree.insert(33);
-    //tree.insert(2);
-    //tree.insert(20);
-    //tree.insert(4);
-    //tree.insert(31);
-    //tree.insert(34);
 
-    //tree.remove(33);
+    std::cout << "minimo: " << minimo << "\n";
+    std::cout << "media: " << media / nPruebas << "\n";
+    std::cout << "maximo: " << maximo << "\n";
 
-    //tree.printTree();
 #endif
     return 0;
 }

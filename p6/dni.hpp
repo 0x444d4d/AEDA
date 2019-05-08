@@ -17,10 +17,11 @@ class DNI {
     public:
         DNI();
 
-        operator unsigned long(void);
+        //operator unsigned long(void);
         bool operator<(DNI right);
         bool operator>(DNI right);
         bool operator==(DNI right);
+
         friend std::ostream& operator<<(std::ostream& os, const DNI<id>& data) {
             for ( char digit : data.id_ ) {
                 std::cout << digit;
@@ -42,10 +43,12 @@ DNI<id>::DNI() {
     id_[9] = '\0';
 }
 
+/*
 template < unsigned id >
 DNI<id>::operator unsigned long(void) {
     return atol(id_);
 }
+*/
 
 template < unsigned id >
 bool DNI<id>::operator==(DNI right) {

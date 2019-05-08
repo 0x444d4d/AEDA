@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include "contador.hpp"
 //#include "dni.hpp"
 
 namespace aeda {
@@ -10,6 +11,7 @@ template <class T>
 class bbtree {
     private:
     node<T>* root_;
+    aeda::Contador<> counter_;
 
     public:
     bbtree(void): root_(nullptr) {}
@@ -17,6 +19,7 @@ class bbtree {
     bool insert( node<T>* &node, T data );
 
     bool search( T data );
+    bool search( node<T>* &node,  T data );
 
     bool remove( T data );
     bool remove( node<T>* &node, T data );
@@ -40,10 +43,32 @@ bool bbtree<T>::insert( node<T>* &node, T data ) {
         node = new aeda::node<T>(data);
         return true;
     }
-    if ( (*node)  < data  ) insert( node->right_, data);
-    if ( (*node) > data  ) insert( node->left_, data);
+    if ( data > *node ) insert( node->right_, data);
+    //counter_++;
+    if ( data < *node ) insert( node->left_, data);
+    //counter_++;
     return 0;
     
+}
+
+template <class T>
+bool bbtree<T>::search( T data ) {
+    return search( root_, data );
+}
+
+template <class T>
+bool bbtree<T>::search( node<T>* &node, T data ) {
+    //counter_++;
+    if ( data < *node ) {
+        if ( node->left_ == nullptr ) return false;
+        return  search( node->left_, data );
+    }
+    //counter_++;
+    if ( data > *node ) {
+        if ( node->right_ == nullptr ) return false;
+        return  search( node->right_, data );
+    }
+    return false;
 }
 
 
@@ -59,10 +84,12 @@ bool bbtree<T>::remove( node<T>* &node, T data ) {
 
     if ( *node < data ) {
         if ( *(node->right_ ) == data ) return replace( node->right_ );
+        //counter_++;
         return remove( node->right_, data );
     } 
     if (*node > data) {
         if ( *(node->left_) == data ) return replace( node->left_ );
+        //counter_++;
         return remove( node->left_, data );
     }
     return false;
@@ -91,11 +118,19 @@ bool bbtree<T>::replace( node<T>* &node ) {
         while ( tmp != nullptr ) {
             last = tmp;
             if ( *aux->right_ < *last ) tmp = tmp->left_;
+            //counter_++;
             if ( *aux->right_ > *last ) tmp = tmp->right_;
+            //counter_++;
         }
 
-        if ( *aux->right_  < *last ) last->left_ = aux->right_;
-        else if ( *aux->right_  > *last) last->right_ = aux->right_;
+        if ( *aux->right_  < *last ) {
+            last->left_ = aux->right_;
+            //counter_++;
+        }
+        else if ( *aux->right_  > *last) {
+            last->right_ = aux->right_;
+            //counter_++;
+        }
         else return false;
 
     } else {
